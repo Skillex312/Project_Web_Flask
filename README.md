@@ -1,6 +1,5 @@
 # Project_Web_Flask
 
-Proyecto Flask
 Este es un proyecto de ejemplo que utiliza Flask para crear una aplicación web simple. La aplicación tiene dos rutas: la página principal y la página de registro.
 
 Requisitos
