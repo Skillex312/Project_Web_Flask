@@ -1,15 +1,21 @@
 import mysql.connector
 
-mydb = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  password="DESCONocido312",
-  database="academia"
-)
+# Establecer la conexión con la base de datos
+class ConexionBD:
+  def __init__(self, host, user, password, database):
+    try:
+      print("Conectando a la base de datos...")
+      self.connection = mysql.connector.connect(
+        host=host,
+        user=user,
+        password=password,
+        database=database
+    )
+      self.cursor = self.connection.cursor()
+    except mysql.connector.Error as error:
+      print("Error al conectarse a la base de datos: {}".format(error))
+      raise
 
-if mydb.is_connected():
-    print("Conexión exitosa a la base de datos")
-else:
-    print("No se pudo conectar a la base de datos")
-
-print(mydb)
+  def ejecutar_consulta(self, consulta, parametros = None):
+    self.cursor.execute(consulta, parametros)
+    return self.cursor.fetchall()
