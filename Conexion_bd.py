@@ -1,5 +1,34 @@
 import mysql.connector
 
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="M4f3s1t43312.",
+  port=3306,
+  database="academia"
+)
+
+"""
+# Get data
+
+mysql = "select * from usuarios"
+mycursor = mydb.cursor()
+mycursor.execute(mysql)
+myresult = mycursor.fetchall()
+
+# Do something
+
+df = pd.DataFrame()
+for x in myresult:
+  df2 = pd.DataFrame(list[x]).T
+  df = pd.concat([df, df2])
+  
+df.to_html('/home_login')
+"""
+
+
+
+
 # Establecer la conexión con la base de datos
 class ConexionBD:
   def __init__(self, host, user, password, database):
