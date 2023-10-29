@@ -1,35 +1,40 @@
-# Project_Web_Flask
-Este proyecto es una aplicación web que permite a los usuarios iniciar sesión y acceder a una página de inicio personalizada. La aplicación está escrita en Python utilizando el framework Flask y utiliza una base de datos MySQL para almacenar las credenciales de los usuarios.
+# Flask_app
 
-Requisitos
-Para ejecutar la aplicación, necesitará tener instalado lo siguiente:
+Este es un proyecto de ejemplo de una aplicación web utilizando el framework Flask de Python.
 
+# Requisitos previos
   - Python 3.x
   - Flask
-  - MySQL
-
+  - MySQL Connector
 
 # Instalación
-
-  - Clonar el repositorio de GitHub en su máquina local.
-  - Crear una base de datos MySQL y una tabla de usuarios utilizando el archivo database.sql proporcionado.
-  - Actualizar la información de conexión de la base de datos en el archivo Conexion_bd.py.
-  - Ejecutar el archivo app.py para iniciar la aplicación.
-
-
+  - Clonar el repositorio: git clone https://github.com/usuario/flask_app.git
+  - Instalar las dependencias: pip install -r requirements.txt
+  - Configurar la base de datos en el archivo app.py
+  - Ejecutar la aplicación: python app.py
+    
 # Uso
-  - Acceda a la página de inicio de la aplicación en su navegador web.
-  - Haga clic en el botón "Iniciar sesión" para acceder a la página de inicio de sesión.
-  - Ingrese su nombre de usuario y contraseña en los campos de entrada y haga clic en el botón "Iniciar sesión".
-  - Si las credenciales son válidas, se le redirigirá a la página de inicio personalizada. De lo contrario, se le redirigirá a una página de error.
+  - Acceder a la aplicación en el navegador web: http://localhost:5000
+  - Iniciar sesión con un nombre de usuario y contraseña válidos
+  - Ver los datos de asistencia de un estudiante específico en la ruta /get_attendance_data
 
+# Estructura del proyecto
+  - app.py: archivo principal de la aplicación Flask
+  - templates/: directorio que contiene las plantillas HTML de la aplicación
+  - static/: directorio que contiene los archivos estáticos (CSS, JavaScript, imágenes, etc.) de la aplicación
+  - Conexion_bd.py: archivo que contiene la clase ConexionBD para conectarse a la base de datos
+  - visual_estu.py: archivo que contiene la clase VisualEstu para visualizar los datos de asistencia
 
 # Contribución
-Si desea contribuir a este proyecto, puede hacer lo siguiente:
+  - Hacer un fork del repositorio
+  - Crear una rama para la nueva funcionalidad: git checkout -b nueva-funcionalidad
+  - Hacer los cambios necesarios y hacer commit: git commit -am 'Agregar nueva funcionalidad'
+  - Hacer push a la rama: git push origin nueva-funcionalidad
+  - Crear un pull request en GitHub
 
-  - Crear un fork del repositorio y enviar una solicitud de extracción con sus cambios.
-  - Informar problemas o errores utilizando la función de problemas de GitHub.
-
+# Créditos
+Autor: Maria Fernanda Londoño y Sebastian Ramirez Laserna
+Email: m.londono8@utp.edu.co y s.ramirez8@utp.edu.co
 
 # Licencia
-Este proyecto está bajo la Licencia MIT. Consulte el archivo LICENSE para obtener más información.
+Este proyecto está bajo la Licencia MIT. Ver el archivo LICENSE para más detalles.
