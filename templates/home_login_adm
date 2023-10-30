@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Portal Administrador</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+
+<body>
+    <!-- NAV BAR -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo" width="50"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a href="{{ url_for('main') }}" class="btn btn-outline-danger">Inicio</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- END NAV BAR -->
+
+    <!-- MAIN CONTAINER -->
+    <div class="container-fluid">
+
+        <!-- STUDENT STATUS -->
+        <div class="container-fluid mt-5 mb-5 p-5">
+            <h1 class="text-center mt-5">Consultar Estado del Estudiante</h1>
+            <div class="container-fluid mt-5 mb-5">
+                <form method="POST" action="{{ url_for('consultar_estado_estudiante') }}">
+                    <div class="mb-3">
+                        <label for="findest" class="form-label">Identificación del Estudiante:</label>
+                        <input type="text" class="form-control" id="findest" name="findest" placeholder="Identificación del Estudiante">                   
+					</div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-danger">Consultar Estado</button>
+                    </div>
+                </form>
+
+                <!-- Mostrar el resultado de la consulta -->
+                {% if estado_estudiante is defined %}
+                <div id="resultado-consulta" class="mt-3">
+                        Estado del estudiante: {{ estado_estudiante }}
+                </div>
+                {% endif %}                    
+				<!-- Mostrar mensaje de error si está definido -->
+                {% if mensaje_error is defined %}
+                <div id="resultado-consulta" class="mt-3 text-danger">
+                    {{ mensaje_error }}
+                </div>
+                    {% endif %}
+            </div>
+        </div>
+        <!-- END STUDENT STATUS -->
+
+    </div>
+    <!-- END MAIN CONTAINER -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>
