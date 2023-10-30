@@ -39,22 +39,18 @@
 					</li>
 				</ul>
 			</div>
-			<button type="button" class="btn btn-outline-danger">
-				<a href="http://127.0.0.1:5000/"
-					class="link-danger link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover">
-					Inicio
-				</a> </button>
+				<a href="{{ url_for('main') }}" class="btn btn-outline-danger">Inicio</a>
 		</div>
 	</nav>
 	<!-- END NAV BAR -->
 
 	<!-- MAIN CONTAINER -->
-	<div class="container">
+	<div class="container-fluid">
 
 		
 		<!-- SCHEDULE -->
 		<h1 id="schedule" class="text-center p-5 mb-5 mt-5"> Horario </h1>
-		<div class="calendar-container border rounded text-center">
+		<div class="calendar-container border rounded text-center mt-5 mb-5 p-3">
 			<iframe src="https://calendar.google.com/calendar/embed?src=c_1c341d6196907bd70ae173939fa23a6ba4d97df07f924fc833ffaf65d6eeb452%40group.calendar.google.com&ctz=America%2FBogota"  style="border-width:0; width: 100%; height: 600px;" frameborder="0"></iframe>
 		</div>
 		<!-- END SCHEDULE -->
@@ -63,48 +59,25 @@
 		
 		<!-- ATTENDANCE -->
 		<h1 id="attendance" class="text-center p-5 mb-5 mt-5"> Asistencia </h1>
-		<div class="container-fluid">
+		<div class="container-fluid mt-5 mb-5">
 			<table class="table">
-				<thead class="table-danger">
-					<th scope="col">Fecha Clase</th>
-					<th scope="col">Asistencia</th>
-					<th scope="col">Maestro</th>
+				<thead>
+					<tr class="table-danger">
+						<th scope="col">Fecha Clase</th>
+						<th scope="col">Instructor</th>
+						<th scope="col">Asistencia</th>
+					</tr>
 				</thead>
 				<tbody>
-					<!-- Aquí se incluirá la tabla dinámicamente utilizando JavaScript -->
+					<tr>
+						<td>...</td>
+						<td>...</td>
+						<td>...</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>
-		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
-		<script>
-			// Código JavaScript para cargar datos de asistencia de forma dinámica
-			$.ajax({
-				url: "/get_attendance_data", // La URL de la ruta en app.py que devuelve los datos de la asistencia
-				type: "GET",
-				dataType: "json",
-				success: function(data) {
-					var tableBody = $("#attendance table tbody");
-					tableBody.empty();
-					innerData = data[0];
-					for (var i = 0; i < innerData.length; i++) {
-						var row = $("<tr></tr>");
-						var date = $("<td></td>").text(innerData[i].date);
-						var attendance = $("<td></td>").text(innerData[i].attendance);
-						var teacher = $("<td></td>").text(innerData[i].teacher);
-						row.append(date);
-						row.append(attendance);
-						row.append(teacher);
-						tableBody.append(row);
-					}
-				},
-
-				error: function(jqXHR, textStatus, errorThrown) {
-					console.log("Error al obtener los datos de la asistencia: " + errorThrown);
-				}
-			});
-		</script>
-<!-- END ATTENDANCE -->
-
+		<!-- END ATTENDANCE -->
 
 
 		
@@ -116,7 +89,24 @@
 		
 		<!-- INFO -->
 		<h1 id="info" class="text-center p-5 mb-5 mt-5"> Información </h1>
-
+		<div class="container-fluid mt-5 mb-5">
+			<table class="table">
+				<thead>
+					<tr class="table-danger">
+						<th scope="col">Nombre</th>
+						<th scope="col">Apellido</th>
+						<th scope="col">Rango Marcial</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>{{ nombre_estudiante }}</td>
+						<td>{{ apellido_estudiante }}</td>
+						<td>{{ rango_marcial_estudiante }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 		<!-- END INFO -->
 
 
