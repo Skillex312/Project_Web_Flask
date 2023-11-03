@@ -8,7 +8,7 @@ app = Flask(__name__)
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'DESCONocido312',
+    'password': 'DESCONocido312.',
     'database': 'academia'
 }
 
@@ -19,9 +19,9 @@ def obtener_datos_estudiante(username):
         connection.conectar(db_config['host'], db_config['user'], db_config['password'])
         cursor = connection.cursor
         consulta = """
-                    SELECT Estudiantes.Nombre, Estudiantes.Apellido, Estudiantes.Rango_Marcial
-                    FROM Estudiantes
-                    INNER JOIN Usuarios ON Usuarios.ID_Estudiante = Estudiantes.ID_Estu
+                    SELECT estudiantes.Nombre, estudiantes.Apellido, estudiantes.Rango_Marcial
+                    FROM estudiantes
+                    INNER JOIN Usuarios ON Usuarios.ID = Estudiantes.ID_Estu
                     WHERE Usuarios.ID = %s
                     """
         cursor.execute(consulta, (username,))
@@ -42,13 +42,51 @@ def obtener_datos_instructor(username):
         consulta = """
             SELECT instructores.Nombre, instructores.Apellido, instructores.Rango_Marcial
             FROM instructores
-            INNER JOIN Usuarios ON Usuarios.ID_Instructor = Instructores.ID_Instruc
+            INNER JOIN Usuarios ON Usuarios.ID = Instructores.ID_Instruc
             WHERE Usuarios.ID = %s
         """
         cursor.execute(consulta, (username,))
         datos_instructor = cursor.fetchone()
 
         return datos_instructor
+    except mysql.connector.Error as err:
+        print("Error de base de datos: {}".format(err))
+        return None
+
+
+def obtener_pagos_estudiante(username):
+    try:
+        connection = ConexionBD(db_config['host'], db_config['user'], db_config['password'], db_config['database'])
+        connection.conectar(db_config['host'], db_config['user'], db_config['password'])
+        cursor = connection.cursor
+        consulta = """
+            SELECT Fecha, Concepto, Monto
+            FROM pagos
+            WHERE ID_Estudiante = %s
+        """
+        cursor.execute(consulta, (username,))
+        pagos_estudiante = cursor.fetchall()
+
+        return pagos_estudiante
+    except mysql.connector.Error as err:
+        print("Error de base de datos: {}".format(err))
+        return None
+
+
+def obtener_pagos_instructor(username):
+    try:
+        connection = ConexionBD(db_config['host'], db_config['user'], db_config['password'], db_config['database'])
+        connection.conectar(db_config['host'], db_config['user'], db_config['password'])
+        cursor = connection.cursor
+        consulta = """
+            SELECT Fecha, Concepto, Monto
+            FROM pagos
+            WHERE ID_Instructor = %s
+        """
+        cursor.execute(consulta, (username,))
+        pagos_instructor = cursor.fetchall()
+
+        return pagos_instructor
     except mysql.connector.Error as err:
         print("Error de base de datos: {}".format(err))
         return None
@@ -73,7 +111,9 @@ def autenticar_usuario(username, password):
                     nombre_estudiante = datos_estudiante[0]
                     apellido_estudiante = datos_estudiante[1]
                     rango_marcial_estudiante = datos_estudiante[2]
-                    return render_template('home_login_est.html', nombre_estudiante=nombre_estudiante, apellido_estudiante=apellido_estudiante, rango_marcial_estudiante=rango_marcial_estudiante)
+                    registros_asistencia = obtener_registros_asistencia_estudiante(username)
+                    pagos_estudiante = obtener_pagos_estudiante(username)  # Nueva línea para obtener los pagos
+                    return render_template('home_login_est.html', nombre_estudiante=nombre_estudiante, apellido_estudiante=apellido_estudiante, rango_marcial_estudiante=rango_marcial_estudiante, registros_asistencia=registros_asistencia, pagos_estudiante=pagos_estudiante)
                 
             elif tipo == 'Instructor':
                 datos_instructor = obtener_datos_instructor(username)
@@ -81,7 +121,9 @@ def autenticar_usuario(username, password):
                     nombre_instructor = datos_instructor[0]
                     apellido_instructor = datos_instructor[1]
                     rango_marcial_instructor = datos_instructor[2]
-                    return render_template('home_login_ins.html', nombre_instructor=nombre_instructor, apellido_instructor=apellido_instructor,rango_marcial_instructor=rango_marcial_instructor)
+                    pagos_instructor = obtener_pagos_instructor(username)  # Nueva línea para obtener los pagos
+                    return render_template('home_login_ins.html', nombre_instructor=nombre_instructor, apellido_instructor=apellido_instructor, rango_marcial_instructor=rango_marcial_instructor, pagos_instructor=pagos_instructor)
+
                 
             elif tipo == 'Administrador':
                 return render_template('home_login_adm.html')
@@ -123,9 +165,9 @@ def obtener_estado_estudiante(id_estudiante):
 
         # Realizar la consulta para obtener el estado del estudiante
         consulta = """
-                    SELECT Estudiantes.Estado
-                    FROM Estudiantes
-                    INNER JOIN Usuarios ON Usuarios.ID_Estudiante = Estudiantes.ID_Estu
+                    SELECT estudiantes.Estado
+                    FROM estudiantes
+                    INNER JOIN Usuarios ON Usuarios.ID = estudiantes.ID_Estu
                     WHERE Usuarios.ID = %s
                     """
         cursor.execute(consulta, (id_estudiante,))
@@ -140,6 +182,47 @@ def obtener_estado_estudiante(id_estudiante):
         print("Error de base de datos: {}".format(err))
         return None
 
+def obtener_nombre_estudiante(id_estudiante):
+    try:
+        connection = ConexionBD(db_config['host'], db_config['user'], db_config['password'], db_config['database'])
+        connection.conectar(db_config['host'], db_config['user'], db_config['password'])
+        cursor = connection.cursor
+        consulta = """
+            SELECT estudiantes.Nombre
+            FROM estudiantes
+            INNER JOIN Usuarios ON Usuarios.ID = estudiantes.ID_Estu
+            WHERE Usuarios.ID = %s
+        """
+        cursor.execute(consulta, (id_estudiante,))
+        nombre_estudiante = cursor.fetchone()
+
+        if nombre_estudiante:
+            return nombre_estudiante[0]
+        else:
+            return None
+
+    except mysql.connector.Error as err:
+        print("Error de base de datos: {}".format(err))
+        return None
+    
+
+def obtener_registros_asistencia_estudiante(username):
+    try:
+        connection = ConexionBD(db_config['host'], db_config['user'], db_config['password'], db_config['database'])
+        connection.conectar(db_config['host'], db_config['user'], db_config['password'])
+        cursor = connection.cursor
+        consulta = """
+            SELECT Fecha, ID_Instructor, Estado
+            FROM asistencia
+            WHERE ID_Estudiante = %s
+        """
+        cursor.execute(consulta, (username,))
+        registros_asistencia = cursor.fetchall()
+
+        return registros_asistencia
+    except mysql.connector.Error as err:
+        print("Error de base de datos: {}".format(err))
+        return None
 
 
 @app.route("/")
@@ -294,15 +377,137 @@ def eliminar_administrador():
 def consultar_estado_estudiante():
     if request.method == 'POST':
         id_estudiante = request.form['findest']
-        estado_estudiante = obtener_estado_estudiante(id_estudiante) 
-        if estado_estudiante is not None:
-            # Renderiza la plantilla 'home_login_adm.html' y pasa el estado del estudiante
-            return render_template('home_login_adm.html', estado_estudiante=estado_estudiante)
+        estado_estudiante = obtener_estado_estudiante(id_estudiante)
+        nombre_estudiante = obtener_nombre_estudiante(id_estudiante)
+        if estado_estudiante is not None and nombre_estudiante is not None:
+            return render_template('home_login_adm.html', estado_estudiante=estado_estudiante, nombre_estudiante=nombre_estudiante)
         else:
             mensaje_error = "El estudiante no se encuentra en la base de datos."
-            return render_template('home_login_adm.html', mensaje_error=mensaje_error)
+            return render_template('home_login_adm.html', estado_estudiante=estado_estudiante, nombre_estudiante=nombre_estudiante)
     else:
         return redirect(url_for('error'))
+
+
+@app.route('/cambiar_estado_estudiante', methods=['POST'])
+def cambiar_estado_estudiante():
+    id_estudiante = request.form['id_estudiante']
+    nuevo_estado = request.form['nuevo_estado']
+
+    try:
+        # Conectar a la base de datos pasando los valores de configuración
+        connection = ConexionBD(db_config['host'], db_config['user'], db_config['password'], db_config['database'])
+        connection.conectar(db_config['host'], db_config['user'], db_config['password'])
+        cursor = connection.cursor
+
+        # Verificar si el estudiante existe antes de modificarlo
+        consulta_buscar = "SELECT * FROM Estudiantes WHERE ID_Estu = %s"
+        cursor.execute(consulta_buscar, (id_estudiante,))
+        estudiante_existente = cursor.fetchone()
+
+        if estudiante_existente:
+            # Realizar la actualización en la base de datos
+            consulta_modificar = "UPDATE Estudiantes SET Estado = %s WHERE ID_Estu = %s"
+            parametros = (nuevo_estado, id_estudiante)
+            cursor.execute(consulta_modificar, parametros)
+
+            # Ahora, realiza el commit usando la conexión a la base de datos
+            connection.connection.commit()
+
+            mensaje = "El estado del estudiante se ha actualizado correctamente."
+            return render_template('home_login_adm.html', mensaje=mensaje)
+
+        else:
+            mensaje = "El estudiante que intentas modificar no existe."
+            return render_template('home_login_adm.html', mensaje=mensaje)
+
+    except mysql.connector.Error as err:
+        print("Error de base de datos: {}".format(err))
+        return redirect(url_for('error'))
+
+@app.route('/agregar_estudiante', methods=['POST'])
+def agregar_estudiante():
+    if request.method == 'POST':
+        # Obtener los datos del formulario
+        id_estudiante = request.form['id_estudiante']
+        nombre_estudiante = request.form['nombre_estudiante']
+        apellido_estudiante = request.form['apellido_estudiante']
+        fecha_nacimiento = request.form['fecha_nacimiento']
+        direccion = request.form['direccion']
+        telefono = request.form['telefono']
+        correo_elec = request.form['correo_elec']
+        rango_marcial = ''  # Establecemos como NULL
+        estado = 'Activo'  # Puedes cambiar el estado predeterminado si lo deseas
+        historial_asis = ''  # Establecemos como NULL
+        historial_pagos = ''  # Establecemos como NULL
+
+        try:
+            # Conectar a la base de datos
+            connection = ConexionBD(db_config['host'], db_config['user'], db_config['password'], db_config['database'])
+            connection.conectar(db_config['host'], db_config['user'], db_config['password'])
+            cursor = connection.cursor
+
+            # Insertar el estudiante en la tabla Estudiantes
+            consulta = "INSERT INTO Estudiantes (ID_Estu, Nombre, Apellido, Fecha_de_Nacimiento, Direccion, Telefono, Correo_Elec, Rango_Marcial, Estado, Historial_Asis, Historial_Pagos) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            parametros = (id_estudiante, nombre_estudiante, apellido_estudiante, fecha_nacimiento, direccion, telefono, correo_elec, rango_marcial, estado, historial_asis, historial_pagos)
+            cursor.execute(consulta, parametros)
+
+            # Crear el usuario con contraseña igual al ID
+            consulta_usuario = "INSERT INTO Usuarios (ID, Nombre, Contrasena, Tipo) VALUES (%s, %s, %s, 'Estudiante')"
+            parametros_usuario = (id_estudiante, nombre_estudiante, id_estudiante)  # Contraseña igual al ID
+            cursor.execute(consulta_usuario, parametros_usuario)
+
+            # Realizar el commit
+            connection.connection.commit()
+
+            mensaje1 = "Estudiante agregado exitosamente."
+            return render_template('home_login_adm.html', mensaje1=mensaje1)
+
+        except mysql.connector.Error as err:
+            print("Error de base de datos: {}".format(err))
+            return redirect(url_for('error'))
+
+    return redirect(url_for('error'))
+
+
+@app.route('/agregar_instructor', methods=['POST'])
+def agregar_instructor():
+    if request.method == 'POST':
+        id_instructor = request.form['id_instructor']
+        nombre_instructor = request.form['nombre_instructor']
+        apellido_instructor = request.form['apellido_instructor']
+        rango_marcial = request.form['rango_marcial']  # Ajusta esto según tus necesidades
+        # Puedes agregar más campos según tus necesidades
+
+        try:
+            # Conectar a la base de datos
+            connection = ConexionBD(db_config['host'], db_config['user'], db_config['password'], db_config['database'])
+            connection.conectar(db_config['host'], db_config['user'], db_config['password'])
+            cursor = connection.cursor
+
+            # Insertar el instructor en la tabla instructores
+            consulta = "INSERT INTO instructores (ID_Instruc, Nombre, Apellido, Rango_Marcial) VALUES (%s, %s, %s, %s)"
+            parametros = (id_instructor, nombre_instructor, apellido_instructor, rango_marcial)
+            cursor.execute(consulta, parametros)
+
+            # Crear el usuario con contraseña igual al ID
+            consulta_usuario = "INSERT INTO Usuarios (ID, Nombre, Contrasena, Tipo) VALUES (%s, %s, %s, 'Instructor')"
+            parametros_usuario = (id_instructor, nombre_instructor, id_instructor)  # Contraseña igual al ID
+            cursor.execute(consulta_usuario, parametros_usuario)
+
+            # Realizar el commit
+            connection.connection.commit()
+
+            mensaje2 = "Instructor agregado exitosamente."
+            return render_template('home_login_adm.html', mensaje2=mensaje2)
+
+        except mysql.connector.Error as err:
+            print("Error de base de datos: {}".format(err))
+            return redirect(url_for('error'))
+
+    return redirect(url_for('error'))
+
+
+    
 
 @app.route('/error')
 def error():
