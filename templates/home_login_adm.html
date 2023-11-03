@@ -43,20 +43,124 @@
                 </form>
 
                 <!-- Mostrar el resultado de la consulta -->
-                {% if estado_estudiante is defined %}
+                {% if estado_estudiante is defined and nombre_estudiante is defined %}
                 <div id="resultado-consulta" class="mt-3">
-                        Estado del estudiante: {{ estado_estudiante }}
+                    Estado del estudiante: {{ nombre_estudiante }}: {{ estado_estudiante }}
+                    </div>
+                        {% endif %}
+                    </div>
                 </div>
-                {% endif %}                    
-				<!-- Mostrar mensaje de error si está definido -->
-                {% if mensaje_error is defined %}
-                <div id="resultado-consulta" class="mt-3 text-danger">
-                    {{ mensaje_error }}
-                </div>
-                    {% endif %}
-            </div>
-        </div>
         <!-- END STUDENT STATUS -->
+
+
+        <!-- CHANGE STUDENT STATUS -->
+            <div class="container-fluid mt-5 mb-5 p-5">
+                <h1 class="text-center mt-5 mb-5">Cambiar Estado del Estudiante</h1>
+                {% if mensaje %}
+                <div class="alert alert-success" role="alert">
+                    {{ mensaje }}
+                </div>
+                {% endif %}
+                <form method="POST" action="{{ url_for('cambiar_estado_estudiante') }}">
+                    <div class="mb-3">
+                        <label for="id_estudiante" class="form-label">Identificación del Estudiante:</label>
+                        <input type="text" class="form-control" id="id_estudiante" name="id_estudiante" placeholder="Identificación del Estudiante">
+                    </div>
+                    <div class="mb-3">
+                        <label for="nuevo_estado" class="form-label">Nuevo Estado:</label>
+                        <select class="form-select" id="nuevo_estado" name="nuevo_estado">
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                            <option value="En Mora">En Mora</option>
+                        </select>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-danger">Cambiar Estado del Estudiante</button>
+                    </div>
+                </form>
+            </div>
+        <!-- END CHANGE STUDENT STATUS -->
+
+        <!-- ADD STUDENT -->
+        <div class="container-fluid mt-5 mb-5 p-5">
+            <h1 class="text-center mt-5 mb-5">Agregar Estudiante</h1>
+
+            {% if mensaje1 %}
+            <div class="alert alert-success" role="alert">
+                {{ mensaje1 }}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('agregar_estudiante') }}">
+                <div class="mb-3">
+                    <label for="id_estudiante" class="form-label">Identificación del Estudiante:</label>
+                    <input type="text" class="form-control" id="id_estudiante" name="id_estudiante" placeholder="Identificación del Estudiante">
+                </div>
+                <div class="mb-3">
+                    <label for="nombre_estudiante" class="form-label">Nombre del Estudiante:</label>
+                    <input type="text" class="form-control" id="nombre_estudiante" name="nombre_estudiante" placeholder="Nombre del Estudiante">
+                </div>
+                <div class="mb-3">
+                    <label for="apellido_estudiante" class="form-label">Apellido del Estudiante:</label>
+                    <input type="text" class="form-control" id="apellido_estudiante" name="apellido_estudiante" placeholder="Apellido del Estudiante">
+                </div>
+                <div class="mb-3">
+                    <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento:</label>
+                    <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento">
+                </div>
+                <div class="mb-3">
+                    <label for="direccion" class="form-label">Dirección:</label>
+                    <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Dirección">
+                </div>
+                <div class="mb-3">
+                    <label for="telefono" class="form-label">Teléfono:</label>
+                    <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Teléfono">
+                </div>
+                <div class="mb-3">
+                    <label for="correo_elec" class="form-label">Correo Electrónico:</label>
+                    <input type="email" class="form-control" id="correo_elec" name="correo_elec" placeholder="Correo Electrónico">
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-danger">Agregar Estudiante</button>
+                </div>
+            </form>
+        </div>
+        <!-- END ADD STUDENT-->
+
+        <!-- ADD INSTRUCTOR -->
+        <div class="container-fluid mt-5 mb-5 p-5">
+            <h1 class="text-center mt-5">Agregar Instructor</h1>
+            {% if mensaje2 %}
+            <div class="alert alert-success" role="alert">
+                {{ mensaje2 }}
+            </div>
+            {% endif %}
+            <form method="POST" action="{{ url_for('agregar_instructor') }}">
+                <div class="mb-3">
+                    <label for="id_instructor" class="form-label">Identificación del Instructor:</label>
+                    <input type="text" class="form-control" id="id_instructor" name="id_instructor" placeholder="Identificación del Instructor">
+                </div>
+                <div class="mb-3">
+                    <label for="nombre_instructor" class="form-label">Nombre del Instructor:</label>
+                    <input type="text" class="form-control" id="nombre_instructor" name="nombre_instructor" placeholder="Nombre del Instructor">
+                </div>
+                <div class="mb-3">
+                    <label for="apellido_instructor" class="form-label">Apellido del Instructor:</label>
+                    <input type="text" class="form-control" id="apellido_instructor" name="apellido_instructor" placeholder="Apellido del Instructor">
+                </div>
+                <div class="mb-3">
+                    <label for="rango_marcial" class="form-label">Rango Marcial:</label>
+                    <input type="text" class="form-control" id="rango_marcial" name="rango_marcial" placeholder="Rango Marcial">
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-danger">Agregar Instructor</button>
+                </div>
+            </form>
+        </div>
+        <!-- END ADD INSTRUCTOR -->
+
+
+
 
     </div>
     <!-- END MAIN CONTAINER -->
