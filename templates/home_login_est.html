@@ -58,8 +58,8 @@
 
 		
 		<!-- ATTENDANCE -->
-		<h1 id="attendance" class="text-center p-5 mb-5 mt-5"> Asistencia </h1>
-		<div class="container-fluid mt-5 mb-5">
+		<div class="container-fluid mt-5 mb-5 p-5">
+			<h1 id="attendance" class="text-center p-5 mb-5 mt-5"> Asistencia </h1>
 			<table class="table">
 				<thead>
 					<tr class="table-danger">
@@ -69,27 +69,50 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td>...</td>
-						<td>...</td>
-						<td>...</td>
-					</tr>
+					{% for registro in registros_asistencia %}
+						<tr>
+							<td>{{ registro[0] }}</td>
+							<td>{{ registro[1] }}</td>
+							<td>{{ registro[2] }}</td>
+						</tr>
+					{% endfor %}
 				</tbody>
+
 			</table>
 		</div>
 		<!-- END ATTENDANCE -->
 
 
-		
 		<!-- PAYMENTS -->
+		<div class="container-fluid mt-5 mb-5 p-5">
 		<h1 id="payments" class="text-center p-5 mb-5 mt-5"> Pagos </h1>
+			<table class="table">
+				<thead>
+					<tr class="table-danger">
+						<th scope="col">Fecha</th>
+						<th scope="col">Concepto</th>
+						<th scope="col">Monto</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for pago in pagos_estudiante %}
+						<tr>
+							<td>{{ pago[0] }}</td>
+							<td>{{ pago[1] }}</td>
+							<td>{{ pago[2] }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
 		<!-- END PAYMENTS -->
 
 
 		
 		<!-- INFO -->
-		<h1 id="info" class="text-center p-5 mb-5 mt-5"> Información </h1>
-		<div class="container-fluid mt-5 mb-5">
+		
+		<div class="container-fluid mt-5 mb-5 p-5">
+			<h1 id="info" class="text-center p-5 mb-5 mt-5"> Información </h1>
 			<table class="table">
 				<thead>
 					<tr class="table-danger">
