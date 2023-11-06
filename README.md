@@ -1,40 +1,30 @@
-# Flask_app
+# Proyecto Final Base de Datos en Flask
 
-Este es un proyecto de ejemplo de una aplicación web utilizando el framework Flask de Python.
+## Descripción
 
-# Requisitos previos
-  - Python 3.x
-  - Flask
-  - MySQL Connector
+Este proyecto es una aplicación web desarrollada en Python utilizando el framework Flask. Se utiliza para gestionar una academia de artes marciales donde todos los integrantes tienen una buena comunicacion por la red. La aplicación se conecta a una base de datos MySQL para almacenar y recuperar datos.
 
-# Instalación
-  - Clonar el repositorio: git clone https://github.com/usuario/flask_app.git
-  - Instalar las dependencias: pip install -r requirements.txt
-  - Configurar la base de datos en el archivo app.py
-  - Ejecutar la aplicación: python app.py
-    
-# Uso
-  - Acceder a la aplicación en el navegador web: http://localhost:5000
-  - Iniciar sesión con un nombre de usuario y contraseña válidos
-  - Ver los datos de asistencia de un estudiante específico en la ruta /get_attendance_data
+## Herramientas utilizadas
 
-# Estructura del proyecto
-  - app.py: archivo principal de la aplicación Flask
-  - templates/: directorio que contiene las plantillas HTML de la aplicación
-  - static/: directorio que contiene los archivos estáticos (CSS, JavaScript, imágenes, etc.) de la aplicación
-  - Conexion_bd.py: archivo que contiene la clase ConexionBD para conectarse a la base de datos
-  - visual_estu.py: archivo que contiene la clase VisualEstu para visualizar los datos de asistencia
+- **Python**: Lenguaje de programación principal utilizado para desarrollar la aplicación.
+- **Flask**: Framework web utilizado para manejar las solicitudes y respuestas HTTP.
+- **MySQL**: Sistema de gestión de bases de datos utilizado para almacenar los datos de la aplicación.
+- **HTML/CSS/JavaScript**: Utilizados para desarrollar las páginas web de la aplicación.
 
-# Contribución
-  - Hacer un fork del repositorio
-  - Crear una rama para la nueva funcionalidad: git checkout -b nueva-funcionalidad
-  - Hacer los cambios necesarios y hacer commit: git commit -am 'Agregar nueva funcionalidad'
-  - Hacer push a la rama: git push origin nueva-funcionalidad
-  - Crear un pull request en GitHub
+## Usuarios y claves de acceso
 
-# Créditos
+- Usuario: 8254, Contraseña: 1234
+- Usuario: 6481, Contraseña: 4321
+- Usuario: 7634, Contraseña: 1111
+- Usuario: 1639, Contraseña: 2000
+
+## Declaración de derechos
+
+Este proyecto es de código abierto y se proporciona "tal cual", sin garantías de ningún tipo. No se otorga ninguna licencia de propiedad intelectual sobre el proyecto y sus contenidos.
+
+## Créditos
 Autor: Maria Fernanda Londoño y Sebastian Ramirez Laserna
-Email: m.londono8@utp.edu.co y s.ramirez8@utp.edu.co
+Email: m.londono1@utp.edu.co y s.ramirez8@utp.edu.co
 
-# Licencia
+## Licencia
 Este proyecto está bajo la Licencia MIT. Ver el archivo LICENSE para más detalles.
