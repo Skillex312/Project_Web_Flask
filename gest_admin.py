@@ -1,141 +1,100 @@
 from Conexion_bd import ConexionBD
-import mysql.connector
+import sqlite3
 
-db_config = {
-            'host': 'localhost',
-            'user': 'root',
-            'password': 'DESCONocido312',
-            'database': 'academia'
-        }
-
-class ConexionBD:
-    def __init__(self, host, user, password, database):
-        self.host = host
-        self.user = user
-        self.password = password
-        self.database = database
-        self.conexion = None
-
-    def conectar(self):
-        self.conexion = mysql.connector.connect(
-            host=self.host,
-            user=self.user,
-            password=self.password,
-            database=self.database
-        )
+database_name = 'academia.db'
 
 class Administrador:
+    @staticmethod
     def obtener_estado_estudiante(id_estudiante):
         try:
-            connection = ConexionBD(db_config['host'], db_config['user'], db_config['password'], db_config['database'])
-            connection.conectar()
-            cursor = connection.conexion.cursor()
+            connection = ConexionBD(database_name)
             consulta = """
-                        SELECT estudiantes.Estado
-                        FROM estudiantes
-                        WHERE Estudiantes.ID_estu = %s
+                        SELECT Estado
+                        FROM Estudiantes
+                        WHERE ID_estu = ?
                         """
-            cursor.execute(consulta, (id_estudiante,))
-            estado_estudiante = cursor.fetchone()
-
-            if estado_estudiante:
-                return estado_estudiante[0]  # Devuelve el estado encontrado
-            else:
-                return None  # Retorna None si no se encuentra el estado
-
-        except mysql.connector.Error as err:
-            print("Error de base de datos: {}".format(err))
+            resultado = connection.obtener_uno(consulta, (id_estudiante,))
+            return resultado[0] if resultado else None
+        except sqlite3.Error as err:
+            print(f"Error de base de datos: {err}")
             return None
-        
+
+    @staticmethod
     def obtener_nombre_estudiante(id_estudiante):
         try:
-            connection = ConexionBD(db_config['host'], db_config['user'], db_config['password'], db_config['database'])
-            connection.conectar()
-            cursor = connection.conexion.cursor
+            connection = ConexionBD(database_name)
             consulta = """
-                        SELECT estudiantes.Nombre
-                        FROM estudiantes
-                        WHERE Estudiantes.ID_estu = %s
+                        SELECT Nombre
+                        FROM Estudiantes
+                        WHERE ID_estu = ?
                     """
-            cursor.execute(consulta, (id_estudiante,))
-            nombre_estudiante = cursor.fetchone()
-
-            if nombre_estudiante:
-                return nombre_estudiante[0]
-            else:
-                return None
-
-        except mysql.connector.Error as err:
-            print("Error de base de datos: {}".format(err))
+            resultado = connection.obtener_uno(consulta, (id_estudiante,))
+            return resultado[0] if resultado else None
+        except sqlite3.Error as err:
+            print(f"Error de base de datos: {err}")
             return None
-        
+
     def cambiar_estado_estudiante(self, id_estudiante, nuevo_estado):
-        connection = ConexionBD(db_config['host'], db_config['user'], db_config['password'], db_config['database'])
-        connection.conectar()
-        cursor = connection.conexion.cursor()
-        consulta = """
-                    Select * 
-                    FROM estudiantes
-                    WHERE ID_estu = %s
-                   """
-        cursor.execute(consulta, (id_estudiante,))
-        estudiante_exis = cursor.fetchone()
+        try:
+            connection = ConexionBD(database_name)
+            consulta_verificacion = "SELECT * FROM Estudiantes WHERE ID_estu = ?"
+            estudiante_exis = connection.obtener_uno(consulta_verificacion, (id_estudiante,))
 
-        if estudiante_exis:
-            actualizacion = """
-                            UPDATE Estudiantes 
-                            SET Estado = %s 
-                            WHERE ID_Estu = %s
-                            """
-            parametros = (nuevo_estado, id_estudiante)
-            cursor.execute(actualizacion, parametros)
-            connection.conexion.commit()
-            mensaje = ("El estado del estudiante ha sido modificado exitosamente.")
-            return mensaje
-        else:
-            mensaje = ("El estudiante que intentas modificar no existe.")
-            return mensaje
-        
+            if estudiante_exis:
+                consulta_actualizacion = """
+                                UPDATE Estudiantes 
+                                SET Estado = ? 
+                                WHERE ID_Estu = ?
+                                """
+                parametros = (nuevo_estado, id_estudiante)
+                connection.ejecutar_consulta(consulta_actualizacion, parametros)
+                return "El estado del estudiante ha sido modificado exitosamente."
+            else:
+                return "El estudiante que intentas modificar no existe."
+        except sqlite3.Error as err:
+            print(f"Error de base de datos: {err}")
+            return "Error al actualizar el estado del estudiante."
+
+    @staticmethod
     def agregar_estudiante(id, nombre, apellido, fecha, direccion, telefono, correo, rango, estado, historial_asis, historial_pagos):
-        connection = ConexionBD(db_config['host'], db_config['user'], db_config['password'], db_config['database'])
-        connection.conectar()
-        cursor = connection.conexion.cursor()
-        insercion = """
-                    INSERT INTO Estudiantes (ID_Estu, Nombre, Apellido, Fecha_de_Nacimiento, Direccion, Telefono, Correo_Elec, Rango_Marcial, Estado, Historial_Asis, Historial_Pagos) 
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
-                    """
-        parametros = (id, nombre, apellido, fecha, direccion, telefono, correo, rango, estado, historial_asis, historial_pagos)
-        cursor.execute(insercion, parametros)
-
-        inser_usuario = """
-                        INSERT INTO Usuarios (ID, Nombre, Contrasena, Tipo) 
-                        VALUES (%s, %s, %s, 'Estudiante')
+        try:
+            connection = ConexionBD(database_name)
+            insercion_estudiante = """
+                        INSERT INTO Estudiantes (ID_Estu, Nombre, Apellido, Fecha_de_Nacimiento, Direccion, Telefono, Correo_Elec, Rango_Marcial, Estado, Historial_Asis, Historial_Pagos) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
                         """
-        parametros_usuario = (id, nombre, id)  # Contraseña igual al ID
-        cursor.execute(inser_usuario, parametros_usuario)
+            parametros_estudiante = (id, nombre, apellido, fecha, direccion, telefono, correo, rango, estado, historial_asis, historial_pagos)
+            connection.ejecutar_consulta(insercion_estudiante, parametros_estudiante)
 
-        connection.conexion.commit()
-        mensaje = ("El estudiante ha sido agregado exitosamente.")
-        return mensaje
-    
+            insercion_usuario = """
+                            INSERT INTO Usuarios (ID, Nombre, Contrasena, Tipo) 
+                            VALUES (?, ?, ?, 'Estudiante')
+                            """
+            parametros_usuario = (id, nombre, id)  # Contraseña igual al ID
+            connection.ejecutar_consulta(insercion_usuario, parametros_usuario)
+            return "El estudiante ha sido agregado exitosamente."
+        except sqlite3.Error as err:
+            print(f"Error de base de datos: {err}")
+            return "Error al agregar al estudiante."
+
+    @staticmethod
     def agregar_instructor(id, nombre, apellido, rango):
-        connection = ConexionBD(db_config['host'], db_config['user'], db_config['password'], db_config['database'])
-        connection.conectar()
-        cursor = connection.conexion.cursor()
-        insercion = """
-                    INSERT INTO Instructores (ID_Instruc, Nombre, Apellido, Rango_Marcial)
-                    VALUES (%s, %s, %s, %s)
-                    """
-        parametros = (id, nombre, apellido, rango)
-        cursor.execute(insercion, parametros)
-
-        inser_usuario = """
-                        INSERT INTO Usuarios (ID, Nombre, Contrasena, Tipo)
-                        VALUES (%s, %s, %s, 'Instructor')
+        try:
+            connection = ConexionBD(database_name)
+            insercion_instructor = """
+                        INSERT INTO Instructores (ID_Instruc, Nombre, Apellido, Rango_Marcial)
+                        VALUES (?, ?, ?, ?)
                         """
-        parametros_usuario = (id, nombre, id) # Contraseña igual al ID
-        cursor.execute(inser_usuario, parametros_usuario)
+            parametros_instructor = (id, nombre, apellido, rango)
+            connection.ejecutar_consulta(insercion_instructor, parametros_instructor)
 
-        connection.conexion.commit()
-        mensaje = ("El instructor ha sido agregado exitosamente.")
-        return mensaje
+            insercion_usuario = """
+                            INSERT INTO Usuarios (ID, Nombre, Contrasena, Tipo)
+                            VALUES (?, ?, ?, 'Instructor')
+                            """
+            parametros_usuario = (id, nombre, id) # Contraseña igual al ID
+            connection.ejecutar_consulta(insercion_usuario, parametros_usuario)
+            return "El instructor ha sido agregado exitosamente."
+        except sqlite3.Error as err:
+            print(f"Error de base de datos: {err}")
+            return "Error al agregar al instructor."

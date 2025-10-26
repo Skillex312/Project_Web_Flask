@@ -1,55 +1,32 @@
 from Conexion_bd import ConexionBD
-import mysql.connector
+import sqlite3
 
-db_config = {
-            'host': 'localhost',
-            'user': 'root',
-            'password': 'DESCONocido312',
-            'database': 'academia'
-        }
-
-class ConexionBD:
-    def __init__(self, host, user, password, database):
-        self.host = host
-        self.user = user
-        self.password = password
-        self.database = database
-        self.conexion = None
-
-    def conectar(self):
-        self.conexion = mysql.connector.connect(
-            host=self.host,
-            user=self.user,
-            password=self.password,
-            database=self.database
-        )
+database_name = 'academia.db'
 
 class Instructor:
     def obtener_datos_instructor(self, id_instructor):
-        connection = ConexionBD(db_config['host'], db_config['user'], db_config['password'], db_config['database'])
-        connection.conectar()
-        cursor = connection.conexion.cursor()
-        consulta = """
-                    SELECT instructores.Nombre, instructores.Apellido, instructores.Rango_Marcial
-                    FROM instructores
-                    INNER JOIN Usuarios ON Usuarios.ID = Instructores.ID_Instruc
-                    WHERE Usuarios.ID = %s
-                """
-        cursor.execute(consulta, (id_instructor,))
-        datos_instructor = cursor.fetchone()
+        try:
+            connection = ConexionBD(database_name)
+            consulta = """
+                        SELECT i.Nombre, i.Apellido, i.Rango_Marcial
+                        FROM Instructores i
+                        JOIN Usuarios u ON u.ID = i.ID_Instruc
+                        WHERE u.ID = ?
+                    """
+            return connection.obtener_uno(consulta, (id_instructor,))
+        except sqlite3.Error as err:
+            print(f"Error de base de datos: {err}")
+            return None
 
-        return datos_instructor
-    
     def obtener_pagos_instructor(self, id_instructor):
-        connection = ConexionBD(db_config['host'], db_config['user'], db_config['password'], db_config['database'])
-        connection.conectar()
-        cursor = connection.conexion.cursor()
-        consulta = """
-                    SELECT Fecha, Concepto, Monto
-                    FROM pagos
-                    WHERE ID_Instructor = %s
-                """
-        cursor.execute(consulta, (id_instructor,))
-        pagos_instructor = cursor.fetchall()
-
-        return pagos_instructor
+        try:
+            connection = ConexionBD(database_name)
+            consulta = """
+                        SELECT Fecha, Concepto, Monto
+                        FROM Pagos
+                        WHERE ID_Instructor = ?
+                    """
+            return connection.obtener_resultados(consulta, (id_instructor,))
+        except sqlite3.Error as err:
+            print(f"Error de base de datos: {err}")
+            return []
