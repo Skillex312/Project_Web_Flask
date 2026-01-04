@@ -1,4 +1,5 @@
 from typing import Dict
+from flask_jwt_extended import create_access_token, create_refresh_token
 from models.user import User
 from utils.responses import success_response, error_response
 from Conexion_bd import ConexionBD
@@ -32,24 +33,18 @@ class AuthController:
                     status_code=400
                 )
             
-            # Conectar a la base de datos
-            connection = ConexionBD(self.database_name)
-            connection.conectar()
+            # Intentar autenticar usando el modelo User (con bcrypt)
+            user = User.authenticate(username, password)
             
-            # Buscar usuario en la base de datos
-            consulta = "SELECT Tipo FROM Usuarios WHERE ID = ? AND Contrasena = ?"
-            parametros = (username, password)
-            resultado = connection.obtener_uno(consulta, parametros)
-            
-            if not resultado:
+            if not user:
                 return error_response(
                     message="Credenciales inválidas",
                     status_code=401
                 )
             
-            tipo = resultado[0]
+            tipo = user.tipo
             
-            # Preparar datos del usuario
+            # Preparar datos del usuario para el token
             user_data = {
                 'id': username,
                 'tipo': tipo
@@ -65,8 +60,29 @@ class AuthController:
             elif tipo == 'DBA':
                 user_data['role'] = 'dba'
             
+            # Generar tokens JWT
+            # El identity es el ID del usuario, claims adicionales van en el token
+            additional_claims = {
+                'tipo': tipo,
+                'role': user_data.get('role', tipo.lower())
+            }
+            
+            access_token = create_access_token(
+                identity=username,
+                additional_claims=additional_claims
+            )
+            refresh_token = create_refresh_token(
+                identity=username,
+                additional_claims=additional_claims
+            )
+            
             return success_response(
-                data={'user': user_data},
+                data={
+                    'user': user_data,
+                    'access_token': access_token,
+                    'refresh_token': refresh_token,
+                    'token_type': 'Bearer'
+                },
                 message="Inicio de sesión exitoso"
             )
                 
@@ -82,9 +98,51 @@ class AuthController:
                 message="Error interno del servidor",
                 status_code=500
             )
-        finally:
-            if connection:
-                connection.cerrar_conexion()
+    
+    def refresh_token(self, current_user_id: str, current_claims: Dict) -> Dict:
+        """
+        Genera un nuevo access token usando el refresh token
+        
+        Args:
+            current_user_id: ID del usuario actual (del refresh token)
+            current_claims: Claims del refresh token actual
+            
+        Returns:
+            Diccionario con el nuevo access token
+        """
+        try:
+            # Verificar que el usuario aún existe
+            if not User.exists(current_user_id):
+                return error_response(
+                    message="Usuario no encontrado",
+                    status_code=404
+                )
+            
+            # Generar nuevo access token con los mismos claims
+            additional_claims = {
+                'tipo': current_claims.get('tipo'),
+                'role': current_claims.get('role')
+            }
+            
+            new_access_token = create_access_token(
+                identity=current_user_id,
+                additional_claims=additional_claims
+            )
+            
+            return success_response(
+                data={
+                    'access_token': new_access_token,
+                    'token_type': 'Bearer'
+                },
+                message="Token renovado exitosamente"
+            )
+            
+        except Exception as e:
+            print(f"❌ Error al refrescar token: {e}")
+            return error_response(
+                message="Error al renovar token",
+                status_code=500
+            )
     
     def _get_student_data(self, username: str) -> Dict:
         """Obtiene datos específicos del estudiante"""

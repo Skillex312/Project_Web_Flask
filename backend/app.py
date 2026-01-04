@@ -1,10 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 from Conexion_bd import ConexionBD
 from gest_estu import Estudiante
 from gest_inst import Instructor
 from gest_admin import Administrador
 from gest_dba import DBA
+from config import Config
 import sqlite3
 
 # Importar blueprints
@@ -12,11 +14,48 @@ from routes.auth_routes import auth_bp
 from routes.student_routes import student_bp
 
 app = Flask(__name__)
+
+# Configuración de la aplicación
+app.config['SECRET_KEY'] = Config.SECRET_KEY
+app.config['JWT_SECRET_KEY'] = Config.JWT_SECRET_KEY
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = Config.JWT_ACCESS_TOKEN_EXPIRES
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = Config.JWT_REFRESH_TOKEN_EXPIRES
+app.config['JWT_TOKEN_LOCATION'] = Config.JWT_TOKEN_LOCATION
+app.config['JWT_HEADER_NAME'] = Config.JWT_HEADER_NAME
+app.config['JWT_HEADER_TYPE'] = Config.JWT_HEADER_TYPE
+
+# Inicializar extensiones
 CORS(app)  # Habilitar CORS para permitir peticiones desde el frontend
+jwt = JWTManager(app)  # Inicializar JWT
 
 # Configuración de la base de datos
-app.config['DATABASE_NAME'] = 'academia.db'
-database_name = 'academia.db'
+app.config['DATABASE_NAME'] = Config.DATABASE_NAME
+database_name = Config.DATABASE_NAME
+
+# Callbacks de JWT para manejo de errores
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return jsonify({
+        'success': False,
+        'message': 'Token expirado',
+        'error': 'token_expired'
+    }), 401
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return jsonify({
+        'success': False,
+        'message': 'Token inválido',
+        'error': 'invalid_token'
+    }), 401
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    return jsonify({
+        'success': False,
+        'message': 'Token de acceso requerido',
+        'error': 'authorization_required'
+    }), 401
 
 # Registrar blueprints de la API REST
 app.register_blueprint(auth_bp)

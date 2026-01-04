@@ -1,12 +1,22 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from controllers.student_controller import StudentController
+from middlewares.auth_middleware import (
+    admin_required,
+    instructor_required,
+    own_data_or_admin
+)
 
 student_bp = Blueprint('student', __name__, url_prefix='/api/students')
 
 @student_bp.route('/', methods=['GET'])
+@instructor_required
 def get_all_students():
     """
     Endpoint para obtener todos los estudiantes
+    
+    Requiere: Rol Instructor o Administrador
+    Headers: Authorization: Bearer <access_token>
     
     Retorna:
     {
@@ -21,9 +31,14 @@ def get_all_students():
     return jsonify(result), result.get('status_code', 200)
 
 @student_bp.route('/<student_id>', methods=['GET'])
+@own_data_or_admin
 def get_student(student_id):
     """
     Endpoint para obtener un estudiante específico
+    
+    Requiere: Autenticación JWT
+    - Administradores/Instructores: pueden ver cualquier estudiante
+    - Estudiantes: solo pueden ver sus propios datos
     
     Args:
         student_id: ID del estudiante en la URL
@@ -46,9 +61,13 @@ def get_student(student_id):
     return jsonify(result), result.get('status_code', 200)
 
 @student_bp.route('/', methods=['POST'])
+@admin_required
 def create_student():
     """
     Endpoint para crear un nuevo estudiante
+    
+    Requiere: Rol Administrador
+    Headers: Authorization: Bearer <access_token>
     
     Espera un JSON con:
     {
@@ -82,9 +101,13 @@ def create_student():
     return jsonify(result), result.get('status_code', 200)
 
 @student_bp.route('/<student_id>/status', methods=['PUT'])
+@instructor_required
 def update_student_status(student_id):
     """
     Endpoint para actualizar el estado de un estudiante
+    
+    Requiere: Rol Instructor o Administrador
+    Headers: Authorization: Bearer <access_token>
     
     Args:
         student_id: ID del estudiante en la URL

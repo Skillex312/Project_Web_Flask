@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 from config import config
 import os
 
@@ -17,6 +18,34 @@ def create_app(config_name='default'):
     
     # Cargar configuración
     app.config.from_object(config[config_name])
+
+    # Inicializar JWT
+    jwt = JWTManager(app)
+
+    # Callbacks de JWT para manejo de errores
+    @jwt.expired_token_loader
+    def expired_token_callback(jwt_header, jwt_payload):
+        return jsonify({
+            'success': False,
+            'message': 'Token expirado',
+            'error': 'token_expired'
+        }), 401
+
+    @jwt.invalid_token_loader
+    def invalid_token_callback(error):
+        return jsonify({
+            'success': False,
+            'message': 'Token inválido',
+            'error': 'invalid_token'
+        }), 401
+
+    @jwt.unauthorized_loader
+    def missing_token_callback(error):
+        return jsonify({
+            'success': False,
+            'message': 'Token de acceso requerido',
+            'error': 'authorization_required'
+        }), 401
     
     # Configurar CORS
     CORS(app, resources={
